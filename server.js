@@ -21,3 +21,13 @@ connection.connect(err=>{
  afterConnection();
 });
 
+afterConnection= ()=>{
+    inquirer.prompt([{
+            type:'list',
+            name: 'selection',
+            message: 'Select from the options',
+            choices:['View All Departments','View all Roles', 'View all Employees','Update Employees','ADD Department','ADD ROLE','ADD EMPLOYEE']
+    }]);
+ 
+     connection.end();
+ };
