@@ -1,7 +1,7 @@
 const inquirer = require("inquirer");
 const sql = require("mysql2");
 const cnsTble = require("console.table");
-//const db= require('.');
+//const db= require('./db/schema.sql');
 
 // create the connection to database
 
@@ -39,8 +39,16 @@ afterConnection = () => {
       },
     ])
     .then((selections) => {
+        
       switch (selections.selection) {
+          
         case "View All Departments":
+         connection.query('SELECT *FROM department',function(err,result){
+            if(err) {
+                console.log(err,'Nothing red');
+            }
+            console.log(result);
+         });
           break;
         case "View All Roles":
           break;
@@ -49,15 +57,42 @@ afterConnection = () => {
         case "Update Employees":
           break;
         case "ADD Department":
+            inquirer.prompt([{
+                type: 'input',
+                name: 'department',
+                message: 'The name of the department your adding?'
+      }]).then(addD=>{
+           
+          connection.query(`INSERT INTO department(id,name)VALUE('1,${addD.department}')`,function(err,result){
+             if(err) console.log( err);
+              console.log(result);
+          });
+        });
+        
           break;
         case "ADD ROLE":
+            
           break;
         case "ADD EMPLOYEE":
           break;
         default:
+            connection.end();
           break;
       }
     });
 
-  connection.end();
+ // 
+//};
+// function viewAllDepartments(){
+   
+//   return connection.query(sqlQuery,function(error,res){
+//       if(error)
+//           return `Nothing in there `;
+      
+//       console.table(res);
+
+//    });
+   
+
+  
 };
