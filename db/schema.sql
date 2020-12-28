@@ -3,8 +3,9 @@ create database emp_tracker_db;
 use emp_tracker_db; 
 
 CREATE TABLE department (
-  id INT PRIMARY KEY NOT NULL,
+  id INT PRIMARY KEY NOT NULL auto_increment,
   name VARCHAR(30) NOT NULL
+  
 );
 
 CREATE TABLE role (

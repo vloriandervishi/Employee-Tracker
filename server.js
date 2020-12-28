@@ -62,8 +62,12 @@ afterConnection = () => {
                 name: 'department',
                 message: 'The name of the department your adding?'
       }]).then(addD=>{
+          connection.query('SELECT COUNT (id) FROM department',function(err,result){
+               if(err) console.log(err);
+               console.log(result); // should print 2
+           });
            
-          connection.query(`INSERT INTO department(id,name)VALUE('1,${addD.department}')`,function(err,result){
+          connection.query(`INSERT INTO department(name)VALUE('${addD.department}')`,function(err,result){
              if(err) console.log( err);
               console.log(result);
           });
