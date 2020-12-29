@@ -1,6 +1,7 @@
 const inquirer = require("inquirer");
 const sql = require("mysql2");
 const cnsTble = require("console.table");
+const Logo=require('../Employee-Tracker/logo');
 //const db= require('./db/schema.sql');
 
 // create the connection to database
@@ -17,6 +18,8 @@ const connection = sql.createConnection({
 connection.connect((err) => {
   if (err) throw err;
   console.log(`
+  ${Logo()}
+  
   `);
   afterConnection();
 });
