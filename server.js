@@ -43,17 +43,23 @@ afterConnection = () => {
         case "View All Departments":
           connection.query("SELECT *FROM department", function (err, result) {
             if (err) {
-              console.log(err, "Nothing red");
+              console.log(err,);
             }
             console.table(result);
           });
           break;
         case "View All Roles":
+            connection.query("SELECT *FROM role", function (err, result) {
+                if (err) {
+                  console.log(err);
+                }
+                console.table(result);
+              });
           break;
         case "View all Employees":
           connection.query("SELECT *FROM employee", function (err, result) {
             if (err) {
-              console.log(err, "Nothing red");
+              console.log(err);
             }
             console.table(result);
           });
@@ -81,6 +87,45 @@ afterConnection = () => {
 
           break;
         case "ADD ROLE":
+          inquirer
+            .prompt([
+              {
+                type: "list",
+                name: "title",
+                message: "What is roles title?",
+                choices: [
+                  "Project Manager",
+                  "Product Owner",
+                  "Team Lead",
+                  "Tech Lead",
+                  "Full-Stack Developer",
+                  "Back-end Developer",
+                  "QA LEAD",
+                  "QA",
+                ],
+              },
+              {
+                type: "input",
+                name: "salary",
+                message: "What is the salary for this role?",
+              },
+              {
+                type: "input",
+                name: "department_id",
+                message: "What is the id for the department ?",
+              },
+            ])
+            .then((roleChoice) => {
+              connection.query(
+                `INSERT INTO role(title,salary,department_id)VALUE('${roleChoice.title}',${roleChoice.salary},${roleChoice.department_id})`,
+                function (err, result) {
+                  if (err) {
+                    console.log(err);
+                  }
+                  console.table(result);
+                }
+              );
+            });
           break;
         case "ADD EMPLOYEE":
           inquirer
