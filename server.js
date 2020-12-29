@@ -48,7 +48,7 @@ afterConnection = () => {
             console.table(result);
           });
           break;
-        case "View All Roles":
+        case "View all Roles":
             connection.query("SELECT *FROM role", function (err, result) {
                 if (err) {
                   console.log(err);
