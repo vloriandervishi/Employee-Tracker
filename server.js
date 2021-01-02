@@ -36,6 +36,7 @@ afterConnection = () => {
           "View All Departments",
           "View all Roles",
           "View all Employees",
+          "View all employees by Managers",
           "Update Employees",
           "ADD Department",
           "ADD ROLE",
@@ -152,8 +153,17 @@ afterConnection = () => {
                 }
               );
             });
-
+       
           break;
+          case "View all employees by Managers":
+            
+                 connection.query(`SELECT employee.first_name, employee.last_name,role.title from employee INNER JOIN role ON manager_id=role.id`,function(error,result){
+                   if(error) console.log(error);
+                   console.table(result);
+                 }
+                 
+                 );
+            break;
         default:
           connection.end();
           break;
