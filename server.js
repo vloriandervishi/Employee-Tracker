@@ -37,28 +37,32 @@ afterConnection = () => {
           "View all Roles",
           "View all Employees",
           "View all employees by Managers",
+          "VIew all employees by Department",
           "Update Employees",
           "ADD Department",
           "ADD ROLE",
           "ADD EMPLOYEE",
+          "Exit",
         ],
       },
     ])
     .then((selections) => {
       switch (selections.selection) {
         case "View All Departments":
+          console.log("\n");
+
           vad();
-         
+
           break;
         case "View all Roles":
           vaRoles();
           break;
         case "View all Employees":
-         vae();
+          vae();
           break;
         case "Update Employees":
-         updateEmployees();
-         break;
+          updateEmployees();
+          break;
         case "ADD Department":
           inquirer
             .prompt([
@@ -73,6 +77,8 @@ afterConnection = () => {
                 `INSERT INTO department(name)VALUE('${addD.department}')`,
                 function (err, result) {
                   if (err) console.log(err);
+                  console.log("\n");
+                  afterConnection();
                   console.table(result);
                 }
               );
@@ -95,6 +101,14 @@ afterConnection = () => {
                   "Back-end Developer",
                   "QA LEAD",
                   "QA",
+                  "Accounting",
+                  "Web Designer",
+                  "Software Engineer",
+                  "Assistant HR Manager",
+                  "QA MANAGER",
+                  "Public Relation Manager",
+                  "IT SUPPORT ANALYST",
+                  " IT Help Desk",
                 ],
               },
               {
@@ -115,6 +129,8 @@ afterConnection = () => {
                   if (err) {
                     console.log(err);
                   }
+                  console.log("\n");
+                  afterConnection();
                   console.table(result);
                 }
               );
@@ -149,142 +165,166 @@ afterConnection = () => {
                 `INSERT INTO employee(first_name,last_name,role_id,manager_id)VALUE('${emP.first}','${emP.last}',${emP.roleId},${emP.managerId})`,
                 function (err, result) {
                   if (err) console.log(err);
+                  console.log("\n");
+                  afterConnection();
                   console.log(result);
                 }
               );
             });
-       
+
           break;
-          case "View all employees by Managers":
-            
-                 connection.query(`SELECT employee.first_name, employee.last_name,role.title from employee INNER JOIN role ON manager_id=role.id`,function(error,result){
-                   if(error) console.log(error);
-                   console.table(result);
-                 }
-                 
-                 );
-            break;
-        default:
+        case "View all employees by Managers":
+          inquirer.prompt([{
+            type:'input',
+            name:'manager',
+            message:'Type the managers id?'
+          }]).then(managers=>{
+          connection.query(
+            `SELECT employee.first_name AS 'FIRST', employee.last_name AS 'LAST',role.title AS'TITLE' from employee INNER JOIN role ON manager_id=role.id WHERE manager_id=${managers.manager}`,
+            function (error, result) {
+              if (error) console.log(error);
+
+              afterConnection();
+              console.log("\n");
+              console.table(result);
+            }
+          
+          );
+          });
+          break;
+        case "VIew all employees by Department":
+          inquirer.prompt([{
+            type:'input',
+            name:'department',
+            message:'Type the managers id?'
+          }]).then(departments=>{
+          connection.query(
+            `select first_name AS "FIRST",last_name AS "LAST",title AS "TITLE",name AS "Department" from employee INNER JOIN role USING(ID) INNER JOIN department USING(ID) WHERE department.id=${departments.department}`,
+            function (error, result) {
+              if (error) console.log(error);
+
+              afterConnection();
+              console.log("\n");
+              console.table(result);
+            }
+          );
+          });
+          break;
+        case "Exit":
           connection.end();
           break;
       }
     });
-
 };
 
-const vad=()=>{
-  
+const vad = () => {
   connection.query("SELECT *FROM department", function (err, result) {
     if (err) {
       console.log(err);
     }
-    console.table(result);
     afterConnection();
+    console.log("\n");
+    console.table(result);
   });
-  
 };
 
-const vaRoles=()=>
-{
+const vaRoles = () => {
   connection.query("SELECT *FROM role", function (err, result) {
     if (err) {
       console.log(err);
     }
-    console.table(result);
+
     afterConnection();
+    console.log("\n");
+    console.table(result);
   });
 };
-const vae=()=>{
+const vae = () => {
   connection.query("SELECT *FROM employee", function (err, result) {
     if (err) {
       console.log(err);
     }
-    console.table(result);
+
     afterConnection();
+    console.log("\n");
+    console.table(result);
   });
 };
-const updateEmployees=()=>{
+const updateEmployees = () => {
   inquirer
-  .prompt([
-    {
-      type: "list",
-      name: "options",
-     // message: "Update the first name?",
-      choices: [
-        "FirstName",
-        "LastName",
-        "RoleID",
-        "ManagerID",
-      ],
-    },
-  ])
-  .then((updateEmployee) => {
-    //console.log(updateEmployee.options);
-    switch (updateEmployee.options) {
-      
-        
-      case "FirstName":
-       
-        inquirer
-          .prompt([
-            {
-              type: "input",
-              name: "oldFirstName",
-              message:
-                "Which existing name  first name would you like to update?",
-            },
-            {
-              type: "input",
-              name: "newFirstName",
-              message:
-                "What would you like to update for the new first name?",
-            },
-          ])
-          .then((newEFirstName) => {
-            //console.log(newEFirstName.newEFirstName,'NEW');
-          // console.log(newEFirstName.oldFirstName,'OLD');
-             connection.query(
-              `UPDATE employee SET first_name='${newEFirstName.newFirstName}' WHERE first_name='${newEFirstName.oldFirstName}'`,
-              function (err, result) {
-                if (err) console.log(err);
-               //console.table(result);
-                vae();
-                
-              }
-            );
-          });
+    .prompt([
+      {
+        type: "list",
+        name: "options",
+        // message: "Update the first name?",
+        choices: ["FirstName", "LastName", "RoleID", "ManagerID"],
+      },
+    ])
+    .then((updateEmployee) => {
+      //console.log(updateEmployee.options);
+      switch (updateEmployee.options) {
+        case "FirstName":
+          inquirer
+            .prompt([
+              {
+                type: "input",
+                name: "oldFirstName",
+                message:
+                  "Which existing name  first name would you like to update?",
+              },
+              {
+                type: "input",
+                name: "newFirstName",
+                message:
+                  "What would you like to update for the new first name?",
+              },
+            ])
+            .then((newEFirstName) => {
+              //console.log(newEFirstName.newEFirstName,'NEW');
+              // console.log(newEFirstName.oldFirstName,'OLD');
+              connection.query(
+                `UPDATE employee SET first_name='${newEFirstName.newFirstName}' WHERE first_name='${newEFirstName.oldFirstName}'`,
+                function (err, result) {
+                  if (err) console.log(err);
+                  //console.table(result);
+                  console.log("\n");
+                  afterConnection();
+                  vae();
+                }
+              );
+            });
           //vae();
-        break;
-      case "LastName":
-        inquirer
-          .prompt([
-            {
-              type: "input",
-              name: "oldLastName",
-              message:
-                "Which existing last name would like to change?",
-            },
-            {
-              type: "input",
-              name: "newLastName",
-              message:
-                "What would you like to update for the last name?",
-            },
-          ])
-          .then((newELastName) => {
-            connection.query(
-              `UPDATE employee SET last_name='${newELastName.newLastName}' WHERE last_name='${newELastName.oldLastName}'`,
-              function (err, result) {
-                if (err) console.log(err);
-                console.table(result);
-                vae();
-                
-              }
-            );
-          });
           break;
-          case 'ManagerID':
-            inquirer
+        case "LastName":
+          inquirer
+            .prompt([
+              {
+                type: "input",
+                name: "oldLastName",
+                message: "Which existing last name would like to change?",
+              },
+              {
+                type: "input",
+                name: "newLastName",
+                message: "What would you like to update for the last name?",
+              },
+            ])
+            .then((newELastName) => {
+              connection.query(
+                `UPDATE employee SET last_name='${newELastName.newLastName}' WHERE last_name='${newELastName.oldLastName}'`,
+                function (err, result) {
+                  if (err) console.log(err);
+                  console.log("\n");
+                  afterConnection();
+                  console.table(result);
+
+                  vae();
+                }
+              );
+            });
+          break;
+        case "ManagerID":
+          inquirer
             .prompt([
               {
                 type: "input",
@@ -304,45 +344,43 @@ const updateEmployees=()=>{
                 `UPDATE employee SET manager_id=${newEmanagerId.newManagerId} WHERE id=${newEmanagerId.selectById}`,
                 function (err, result) {
                   if (err) console.log(err);
+                  console.log("\n");
+                  afterConnection();
                   console.table(result);
                   vae();
                 }
               );
             });
-        break;
-      case "RoleID":
-        inquirer
-          .prompt([
-            {
-              type: "input",
-              name: "selectById",
-              message:
-                "Select the id wich you want to change the role_id for?",
-            },
-            {
-              type: "input",
-              name: "newRoleID",
-              message:
-                "What would like to update for the role id?",
-            }
-          ])
-          .then((newEroleId) => {
-            
-            connection.query(
-              `UPDATE employee SET role_id=${newEroleId.newRoleID} WHERE id=${newEroleId.selectById}`,
-              function (err, result) {
-                if (err) console.log(err);
-                console.table(result);
-                vae();
-                 
-              }
-            );
-          });
-          
-        break;
-        
-    }
-    
-  });
+          break;
+        case "RoleID":
+          inquirer
+            .prompt([
+              {
+                type: "input",
+                name: "selectById",
+                message:
+                  "Select the employee's id wich you want to change the role_id for?",
+              },
+              {
+                type: "input",
+                name: "newRoleID",
+                message: "What would like to update for the role id?",
+              },
+            ])
+            .then((newEroleId) => {
+              connection.query(
+                `UPDATE employee SET role_id=${newEroleId.newRoleID} WHERE id=${newEroleId.selectById}`,
+                function (err, result) {
+                  if (err) console.log(err);
+                  console.log("\n");
+                  afterConnection();
+                  console.table(result);
+                  vae();
+                }
+              );
+            });
 
-}
+          break;
+      }
+    });
+};

@@ -2,7 +2,8 @@ DROP database if exists emp_tracker_db;
 create database emp_tracker_db;
 use emp_tracker_db; 
 
-CREATE TABLE department (
+
+CREATE TABLE department  (
   id INT PRIMARY KEY NOT NULL auto_increment,
   name VARCHAR(30) NOT NULL
   
