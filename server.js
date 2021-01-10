@@ -38,10 +38,14 @@ afterConnection = () => {
           "View all Employees",
           "View all employees by Managers",
           "VIew all employees by Department",
+          "View Budget of A Department",
           "Update Employees",
           "ADD Department",
           "ADD ROLE",
           "ADD EMPLOYEE",
+          "Delete Employee",
+          "Delete Role",
+          "Delete Department",
           "Exit",
         ],
       },
@@ -109,6 +113,8 @@ afterConnection = () => {
                   "Public Relation Manager",
                   "IT SUPPORT ANALYST",
                   " IT Help Desk",
+                  "Media Relations",
+                  "Customer Service Desk",
                 ],
               },
               {
@@ -174,41 +180,135 @@ afterConnection = () => {
 
           break;
         case "View all employees by Managers":
-          inquirer.prompt([{
-            type:'input',
-            name:'manager',
-            message:'Type the managers id?'
-          }]).then(managers=>{
-          connection.query(
-            `SELECT employee.first_name AS 'FIRST', employee.last_name AS 'LAST',role.title AS'TITLE' from employee INNER JOIN role ON manager_id=role.id WHERE manager_id=${managers.manager}`,
-            function (error, result) {
-              if (error) console.log(error);
+          inquirer
+            .prompt([
+              {
+                type: "input",
+                name: "manager",
+                message: "Type the managers id?",
+              },
+            ])
+            .then((managers) => {
+              connection.query(
+                `SELECT employee.first_name AS 'FIRST', employee.last_name AS 'LAST',role.title AS'TITLE' from employee INNER JOIN role ON manager_id=role.id WHERE manager_id=${managers.manager}`,
+                function (error, result) {
+                  if (error) console.log(error);
 
-              afterConnection();
-              console.log("\n");
-              console.table(result);
-            }
-          
-          );
-          });
+                  afterConnection();
+                  console.log("\n");
+                  console.table(result);
+                }
+              );
+            });
           break;
         case "VIew all employees by Department":
-          inquirer.prompt([{
-            type:'input',
-            name:'department',
-            message:'Type the managers id?'
-          }]).then(departments=>{
-          connection.query(
-            `select first_name AS "FIRST",last_name AS "LAST",title AS "TITLE",name AS "Department" from employee INNER JOIN role USING(ID) INNER JOIN department USING(ID) WHERE department.id=${departments.department}`,
-            function (error, result) {
-              if (error) console.log(error);
+          inquirer
+            .prompt([
+              {
+                type: "input",
+                name: "department",
+                message: "Type the department  id?",
+              },
+            ])
+            .then((departments) => {
+              connection.query(
+                `select first_name AS "FIRST",last_name AS "LAST", salary, title AS "TITLE",name AS "Department" from employee INNER JOIN role ON employee.role_id=role.id INNER JOIN department ON role.department_id=department.id  WHERE department.id=${departments.department}`,
+                function (error, result) {
+                  if (error) console.log(error);
 
-              afterConnection();
-              console.log("\n");
-              console.table(result);
-            }
-          );
-          });
+                  afterConnection();
+                  console.log("\n");
+                  console.table(result);
+                }
+              );
+            });
+          break;
+        case "Delete Employee":
+          inquirer
+            .prompt([
+              {
+                type: "input",
+                name: "delete",
+                message: "Type in the employee id you want to delete?",
+              },
+            ])
+            .then((deleteEmployee) => {
+              connection.query(
+                `DELETE FROM EMPLOYEE WHERE employee.id=${deleteEmployee.delete}`,
+                function (err, result) {
+                  if (err) console.log(err);
+
+                  console.log("\n");
+                  console.table(result);
+                  afterConnection();
+                }
+              );
+            });
+          break;
+        case "Delete Role":
+          inquirer
+            .prompt([
+              {
+                type: "input",
+                name: "delete",
+                message: "Type in the employee id you want to delete?",
+              },
+            ])
+            .then((deleteRole) => {
+              connection.query(
+                `DELETE FROM role WHERE role.id=${deleteRole.delete}`,
+                function (err, result) {
+                  if (err) console.log(err);
+
+                  console.log("\n");
+                  console.table(result);
+                  afterConnection();
+                }
+              );
+            });
+          break;
+        case "Delete Department":
+          inquirer
+            .prompt([
+              {
+                type: "input",
+                name: "delete",
+                message: "Type in the employee id you want to delete?",
+              },
+            ])
+            .then((deleteDepartment) => {
+              connection.query(
+                `DELETE FROM EMPLOYEE WHERE employee.id=${deleteDepartment.delete}`,
+                function (err, result) {
+                  if (err) console.log(err);
+
+                  console.log("\n");
+                  console.table(result);
+                  afterConnection();
+                }
+              );
+            });
+          break;
+        case "View Budget of A Department":
+          inquirer
+            .prompt([
+              {
+                type: "input",
+                name: "budget",
+                message: "Type in the id of the department?",
+              },
+            ])
+            .then((budgets) => {
+              connection.query(
+                `select SUM(salary) AS "BUDGET", name AS "Department" from employee INNER JOIN role ON employee.role_id=role.id INNER JOIN department ON role.department_id=department.id WHERE department.id=${budgets.budget}`,
+                function (err, result) {
+                  if (err) console.log(err);
+                  console.log("\n");
+                  console.table(result);
+                  afterConnection();
+                }
+              );
+            });
           break;
         case "Exit":
           connection.end();
