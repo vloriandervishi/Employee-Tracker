@@ -3,7 +3,6 @@ const sql = require("mysql2");
 const cnsTble = require("console.table");
 const Logo = require("../Employee-Tracker/logo");
 const { up } = require("inquirer/lib/utils/readline");
-require('events').EventEmitter.defaultMaxListeners=100;
 
 const connection = sql.createConnection({
   host: "localhost",
@@ -38,12 +37,8 @@ afterConnection = () => {
           "VIew all employees by Department",
           "View Budget of A Department",
           "Update Employees",
-          "ADD-Department",
-          "ADD-ROLE",
-          "ADD-EMPLOYEE",
-          "Delete Employee",
-          "Delete Role",
-          "Delete Department",
+          "ADD",
+          "Delete",
           "Exit",
         ],
       },
@@ -68,6 +63,14 @@ afterConnection = () => {
           console.log("\n");
           updateEmployees();
           break;
+          case "ADD":
+            inquirer.prompt({
+               type:'list',
+               name:'addList',
+               message:'Select what item on the list?',
+               choices:['ADD-Department','ADD-ROLE','ADD-EMPLOYEE']
+            }).then(addL=>{
+            switch(addL.addList){
         case "ADD-Department":
           inquirer
             .prompt([
@@ -75,22 +78,20 @@ afterConnection = () => {
                 type: "input",
                 name: "department",
                 message: "The name of the department your adding?",
-
               },
             ])
             .then((addD) => {
-             
               connection.query(
                 `INSERT INTO department(name)VALUE('${addD.department}')`,
                 function (err, result) {
                   if (err) console.log(err);
-                  console.log("\n");
-                  afterConnection();
-                  console.log("\n");
-                 vad();
-                 console.log("\n");
+                  console.log("\n\n\n\n\n\n");
+                  console.table(result, "\n");
+                  console.log("\n\n\n\n\n\n");
                 }
               );
+              vad();
+              afterConnection();
             });
 
           break;
@@ -137,16 +138,17 @@ afterConnection = () => {
               connection.query(
                 `INSERT INTO role(title,salary,department_id)VALUE('${roleChoice.title}',${roleChoice.salary},${roleChoice.department_id})`,
                 function (err, result) {
-                  if (err) {
+                  if (!err) {
                     console.log(err);
                   }
-                  console.log("\n");
-                  afterConnection();
-                  console.log("\n");
+
+                  console.log("\n\n\n\n\n\n");
                   console.table(result);
-                  console.log("\n");
+                  console.log("\n\n\n\n\n\n");
                 }
               );
+              console.log("\n");
+              afterConnection();
             });
           break;
         case "ADD-EMPLOYEE":
@@ -177,16 +179,21 @@ afterConnection = () => {
               connection.query(
                 `INSERT INTO employee(first_name,last_name,role_id,manager_id)VALUE('${emP.first}','${emP.last}',${emP.roleId},${emP.managerId})`,
                 function (err, result) {
-                  if (err) console.log(err);
-                  console.log("\n");
-                  afterConnection();
-                  console.log("\n");
-                  console.log(result);
-                  console.log("\n");
+                  if (!err) console.log(err);
+
+                  console.log("\n\n\n\n\n\n");
+                  console.table(result);
+                  console.log("\n\n\n\n\n\n");
                 }
               );
+              console.log("\n");
+              afterConnection();
             });
 
+          break;
+            }
+            
+          });
           break;
         case "View all employees by Managers":
           inquirer
@@ -201,13 +208,15 @@ afterConnection = () => {
               connection.query(
                 `SELECT employee.first_name AS 'FIRST', employee.last_name AS 'LAST',role.title AS'TITLE' from employee INNER JOIN role ON manager_id=role.id WHERE manager_id=${managers.manager}`,
                 function (error, result) {
-                  if (error) console.log(error);
-                  console.log("\n");
-                  afterConnection();
-                  console.log("\n");
+                  if (!error) console.log(error);
+
+                  console.log("\n\n\n\n\n\n");
                   console.table(result);
-                 
-                });
+                  console.log("\n\n\n\n\n\n");
+                }
+              );
+              console.log("\n");
+              afterConnection();
             });
           break;
         case "VIew all employees by Department":
@@ -223,85 +232,102 @@ afterConnection = () => {
               connection.query(
                 `select first_name AS "FIRST",last_name AS "LAST", salary, title AS "TITLE",name AS "Department" from employee INNER JOIN role ON employee.role_id=role.id INNER JOIN department ON role.department_id=department.id  WHERE department.id=${departments.department}`,
                 function (error, result) {
-                  if (error) console.log(error);
+                  if (!error) console.log(error);
 
-                  afterConnection();
-                  console.log("\n");
+                  console.log("\n\n\n\n\n\n");
                   console.table(result);
-                  console.log("\n");
+                  console.log("\n\n\n\n\n\n");
                 }
               );
+              afterConnection();
             });
           break;
-        case "Delete Employee":
+        case "Delete":
           inquirer
-            .prompt([
-              {
-                type: "input",
-                name: "delete",
-                message: "Type in the employee id you want to delete?",
-              },
-            ])
-            .then((deleteEmployee) => {
-              connection.query(
-                `DELETE FROM EMPLOYEE WHERE employee.id=${deleteEmployee.delete}`,
-                function (err, result) {
-                  if (err) console.log(err);
+            .prompt({
+              type: "list",
+              name: "deleteList",
+              message: "What do you want to delete?",
+              choices:['Delete-Employee','Delete-Role','Delete-Department']
+            })
+            .then(deleteThis => {
 
-                  console.log("\n");
-                  console.table(result);
-                  afterConnection();
-                  console.log("\n");
-                }
-              );
-            });
-          break;
-        case "Delete Role":
-          inquirer
-            .prompt([
-              {
-                type: "input",
-                name: "delete",
-                message: "Type in the role id you want to delete?",
-              },
-            ])
-            .then((deleteRole) => {
-              connection.query(
-                `DELETE FROM role WHERE role.id=${deleteRole.delete}`,
-                function (err, result) {
-                  if (err) console.log(err);
+              switch (deleteThis.deleteList) {
+                case "Delete-Employee":
+                  inquirer
+                    .prompt([
+                      {
+                        type: "input",
+                        name: "delete",
+                        message: "Type in the employee id you want to delete?",
+                      },
+                    ])
+                    .then((deleteEmployee) => {
+                      connection.query(
+                        `DELETE FROM EMPLOYEE WHERE employee.id=${deleteEmployee.delete}`,
+                        function (err, result) {
+                          if (!err) console.log(err);
 
-                  console.log("\n");
-                  console.table(result);
-                  afterConnection();
-                  console.log("\n");
-                }
-              );
-            });
-          break;
-        case "Delete Department":
-          inquirer
-            .prompt([
-              {
-                type: "input",
-                name: "delete",
-                message: "Type in the department id you want to delete?",
-              },
-            ])
-            .then((deleteDepartment) => {
-              connection.query(
-                `DELETE FROM DEPARTMENT WHERE department.id=${deleteDepartment.delete}`,
-                function (err, result) {
-                  if (err) console.log(err);
+                          console.log("\n\n\n\n\n\n");
+                          console.table(result);
+                          console.log("\n\n\n\n\n\n");
+                        }
+                      );
+                      afterConnection();
+                    });
+                  break;
+                case "Delete-Role":
+                  inquirer
+                    .prompt([
+                      {
+                        type: "input",
+                        name: "delete",
+                        message: "Type in the role id you want to delete?",
+                      },
+                    ])
+                    .then((deleteRole) => {
+                      connection.query(
+                        `DELETE FROM role WHERE role.id=${deleteRole.delete}`,
+                        function (err, result) {
+                          if (!err) console.log(err);
 
-                  console.log("\n");
-                  console.table(result);
-                  afterConnection();
-                  console.log("\n");
-                }
-              );
+                          console.log("\n\n\n\n\n\n");
+                          console.table(result);
+                          console.log("\n\n\n\n\n\n");
+                        }
+                      );
+                      afterConnection();
+                    });
+                  break;
+                case "Delete-Department":
+                  inquirer
+                    .prompt([
+                      {
+                        type: "input",
+                        name: "delete",
+                        message:
+                          "Type in the department id you want to delete?",
+                      },
+                    ])
+                    .then((deleteDepartment) => {
+                      connection.query(
+                        `DELETE FROM DEPARTMENT WHERE department.id=${deleteDepartment.delete}`,
+                        function (err, result) {
+                          if (!err) console.log(err);
+
+                          console.log("\n\n\n\n\n\n");
+                          console.table(result, "\n");
+                          console.log("\n\n\n\n\n\n");
+                        }
+                      );
+                      vad();
+                      afterConnection();
+                    });
+                  break;
+              }
+              
             });
-          break;
+            break;
         case "View Budget of A Department":
           inquirer
             .prompt([
@@ -315,13 +341,14 @@ afterConnection = () => {
               connection.query(
                 `select SUM(salary) AS "BUDGET", name AS "Department" from employee INNER JOIN role ON employee.role_id=role.id INNER JOIN department ON role.department_id=department.id WHERE department.id=${budgets.budget}`,
                 function (err, result) {
-                  if (err) console.log(err);
+                  if (!err) console.log(err);
                   console.log("\n");
                   console.table(result);
-                  afterConnection();
+
                   console.log("\n");
                 }
               );
+              afterConnection();
             });
           break;
         case "Exit":
@@ -332,37 +359,41 @@ afterConnection = () => {
 };
 
 const vad = () => {
+  afterConnection();
   connection.query("SELECT *FROM department", function (err, result) {
-    if (err) {
+    if (!err) {
       console.log(err);
     }
-    afterConnection();
-    console.log("\n");
+    console.log("\n\n\n\n\n\n");
     console.table(result);
+    console.log("\n\n\n\n\n\n");
   });
 };
 
 const vaRoles = () => {
   connection.query("SELECT *FROM role", function (err, result) {
-    if (err) {
+    if (!err) {
       console.log(err);
     }
 
-    afterConnection();
-    console.log("\n");
+    console.log("\n\n\n\n\n\n");
     console.table(result);
+    console.log("\n\n\n\n\n\n");
   });
+
+  afterConnection();
 };
 const vae = () => {
   connection.query("SELECT *FROM employee", function (err, result) {
-    if (err) {
+    if (!err) {
       console.log(err);
     }
 
-    afterConnection();
-    console.log("\n");
+    console.log("\n\n\n\n\n\n");
     console.table(result);
+    console.log("\n\n\n\n\n\n");
   });
+  afterConnection();
 };
 const updateEmployees = () => {
   inquirer
@@ -399,14 +430,16 @@ const updateEmployees = () => {
               connection.query(
                 `UPDATE employee SET first_name='${newEFirstName.newFirstName}' WHERE first_name='${newEFirstName.oldFirstName}'`,
                 function (err, result) {
-                  if (err) console.log(err);
-                  //console.table(result);
-                  console.log("\n");
-                  afterConnection();
-                  console.log("\n");
-                  vae();
+                  if (!err) console.log(err);
+                  console.log("\n\n\n\n\n\n");
+                  console.table(result);
+                  console.log("\n\n\n\n\n\n");
                 }
               );
+              console.log("\n");
+              afterConnection();
+              console.log("\n");
+              vae();
             });
           //vae();
           break;
@@ -428,14 +461,16 @@ const updateEmployees = () => {
               connection.query(
                 `UPDATE employee SET last_name='${newELastName.newLastName}' WHERE last_name='${newELastName.oldLastName}'`,
                 function (err, result) {
-                  if (err) console.log(err);
+                  if (!err) console.log(err);
                   console.log("\n");
-                  afterConnection();
+
+                  console.log("\n\n\n\n\n\n");
                   console.table(result);
-                  console.log("\n");
-                  vae();
+                  console.log("\n\n\n\n\n\n");
                 }
               );
+              vae();
+              afterConnection();
             });
           break;
         case "ManagerID":
@@ -458,14 +493,14 @@ const updateEmployees = () => {
               connection.query(
                 `UPDATE employee SET manager_id=${newEmanagerId.newManagerId} WHERE id=${newEmanagerId.selectById}`,
                 function (err, result) {
-                  if (err) console.log(err);
-                  console.log("\n");
-                  afterConnection();
+                  if (!err) console.log(err);
+                  console.log("\n\n\n\n\n\n");
                   console.table(result);
-                  console.log("\n");
-                  vae();
+                  console.log("\n\n\n\n\n\n");
                 }
               );
+              vae();
+              afterConnection();
             });
           break;
         case "RoleID":
@@ -487,18 +522,19 @@ const updateEmployees = () => {
               connection.query(
                 `UPDATE employee SET role_id=${newEroleId.newRoleID} WHERE id=${newEroleId.selectById}`,
                 function (err, result) {
-                  if (err) console.log(err);
+                  if (!err) console.log(err);
                   console.log("\n");
-                  afterConnection();
+
+                  console.log("\n\n\n\n\n\n");
                   console.table(result);
-                  console.log("\n");
-                  vae();
+                  console.log("\n\n\n\n\n\n");
                 }
               );
+              afterConnection();
+              vae();
             });
 
           break;
       }
     });
-
-  };
+};
