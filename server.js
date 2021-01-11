@@ -3,9 +3,7 @@ const sql = require("mysql2");
 const cnsTble = require("console.table");
 const Logo = require("../Employee-Tracker/logo");
 const { up } = require("inquirer/lib/utils/readline");
-//const db= require('./db/schema.sql');
-
-// create the connection to database
+require('events').EventEmitter.defaultMaxListeners=100;
 
 const connection = sql.createConnection({
   host: "localhost",
@@ -40,9 +38,9 @@ afterConnection = () => {
           "VIew all employees by Department",
           "View Budget of A Department",
           "Update Employees",
-          "ADD Department",
-          "ADD ROLE",
-          "ADD EMPLOYEE",
+          "ADD-Department",
+          "ADD-ROLE",
+          "ADD-EMPLOYEE",
           "Delete Employee",
           "Delete Role",
           "Delete Department",
@@ -59,37 +57,44 @@ afterConnection = () => {
 
           break;
         case "View all Roles":
+          console.log("\n");
           vaRoles();
           break;
         case "View all Employees":
+          console.log("\n");
           vae();
           break;
         case "Update Employees":
+          console.log("\n");
           updateEmployees();
           break;
-        case "ADD Department":
+        case "ADD-Department":
           inquirer
             .prompt([
               {
                 type: "input",
                 name: "department",
                 message: "The name of the department your adding?",
+
               },
             ])
             .then((addD) => {
+             
               connection.query(
                 `INSERT INTO department(name)VALUE('${addD.department}')`,
                 function (err, result) {
                   if (err) console.log(err);
                   console.log("\n");
                   afterConnection();
-                  console.table(result);
+                  console.log("\n");
+                 vad();
+                 console.log("\n");
                 }
               );
             });
 
           break;
-        case "ADD ROLE":
+        case "ADD-ROLE":
           inquirer
             .prompt([
               {
@@ -137,12 +142,14 @@ afterConnection = () => {
                   }
                   console.log("\n");
                   afterConnection();
+                  console.log("\n");
                   console.table(result);
+                  console.log("\n");
                 }
               );
             });
           break;
-        case "ADD EMPLOYEE":
+        case "ADD-EMPLOYEE":
           inquirer
             .prompt([
               {
@@ -173,7 +180,9 @@ afterConnection = () => {
                   if (err) console.log(err);
                   console.log("\n");
                   afterConnection();
+                  console.log("\n");
                   console.log(result);
+                  console.log("\n");
                 }
               );
             });
@@ -193,12 +202,12 @@ afterConnection = () => {
                 `SELECT employee.first_name AS 'FIRST', employee.last_name AS 'LAST',role.title AS'TITLE' from employee INNER JOIN role ON manager_id=role.id WHERE manager_id=${managers.manager}`,
                 function (error, result) {
                   if (error) console.log(error);
-
+                  console.log("\n");
                   afterConnection();
                   console.log("\n");
                   console.table(result);
-                }
-              );
+                 
+                });
             });
           break;
         case "VIew all employees by Department":
@@ -219,6 +228,7 @@ afterConnection = () => {
                   afterConnection();
                   console.log("\n");
                   console.table(result);
+                  console.log("\n");
                 }
               );
             });
@@ -241,6 +251,7 @@ afterConnection = () => {
                   console.log("\n");
                   console.table(result);
                   afterConnection();
+                  console.log("\n");
                 }
               );
             });
@@ -251,7 +262,7 @@ afterConnection = () => {
               {
                 type: "input",
                 name: "delete",
-                message: "Type in the employee id you want to delete?",
+                message: "Type in the role id you want to delete?",
               },
             ])
             .then((deleteRole) => {
@@ -263,6 +274,7 @@ afterConnection = () => {
                   console.log("\n");
                   console.table(result);
                   afterConnection();
+                  console.log("\n");
                 }
               );
             });
@@ -273,18 +285,19 @@ afterConnection = () => {
               {
                 type: "input",
                 name: "delete",
-                message: "Type in the employee id you want to delete?",
+                message: "Type in the department id you want to delete?",
               },
             ])
             .then((deleteDepartment) => {
               connection.query(
-                `DELETE FROM EMPLOYEE WHERE employee.id=${deleteDepartment.delete}`,
+                `DELETE FROM DEPARTMENT WHERE department.id=${deleteDepartment.delete}`,
                 function (err, result) {
                   if (err) console.log(err);
 
                   console.log("\n");
                   console.table(result);
                   afterConnection();
+                  console.log("\n");
                 }
               );
             });
@@ -306,6 +319,7 @@ afterConnection = () => {
                   console.log("\n");
                   console.table(result);
                   afterConnection();
+                  console.log("\n");
                 }
               );
             });
@@ -389,6 +403,7 @@ const updateEmployees = () => {
                   //console.table(result);
                   console.log("\n");
                   afterConnection();
+                  console.log("\n");
                   vae();
                 }
               );
@@ -417,7 +432,7 @@ const updateEmployees = () => {
                   console.log("\n");
                   afterConnection();
                   console.table(result);
-
+                  console.log("\n");
                   vae();
                 }
               );
@@ -447,6 +462,7 @@ const updateEmployees = () => {
                   console.log("\n");
                   afterConnection();
                   console.table(result);
+                  console.log("\n");
                   vae();
                 }
               );
@@ -475,6 +491,7 @@ const updateEmployees = () => {
                   console.log("\n");
                   afterConnection();
                   console.table(result);
+                  console.log("\n");
                   vae();
                 }
               );
@@ -483,4 +500,5 @@ const updateEmployees = () => {
           break;
       }
     });
-};
+
+  };
